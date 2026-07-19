@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.sergii-ziborov/weavatrix-online",
+  "description": "Expanded Weavatrix MCP for Cloud and licensed Enterprise endpoints, built on the MIT offline core.",
+  "repository": {"url": "https://github.com/sergii-ziborov/weavatrix-online", "source": "github"},
+  "version": "0.1.0",
+  "websiteUrl": "https://weavatrix.com",
+  "packages": [{
+    "registryType": "npm",
+    "registryBaseUrl": "https://registry.npmjs.org",
+    "identifier": "weavatrix-online",
+    "version": "0.1.0",
+    "runtimeHint": "npx",
+    "transport": {"type": "stdio"},
+    "packageArguments": [{
+      "type": "positional",
+      "valueHint": "repoRoot",
+      "description": "Absolute path to the initial local Git repository",
+      "isRequired": true
+    }],
+    "environmentVariables": [
+      {"name": "WEAVATRIX_SYNC_URL", "description": "Cloud or licensed Enterprise sync endpoint", "format": "string", "isRequired": true},
+      {"name": "WEAVATRIX_SYNC_TOKEN", "description": "Scoped bearer token for the selected endpoint", "format": "string", "isSecret": true, "isRequired": true},
+      {"name": "WEAVATRIX_CAPABILITIES_URL", "description": "Optional explicit endpoint capability document URL; defaults to /api/v1/capabilities on the sync origin with legacy /api/health fallback", "format": "string", "isRequired": false},
+      {"name": "WEAVATRIX_ARCHITECTURE_URL", "description": "Optional explicit architecture-contract URL", "format": "string", "isRequired": false},
+      {"name": "WEAVATRIX_PRECISION", "description": "Core semantic precision: lsp (default) or off", "format": "string", "isRequired": false},
+      {"name": "WEAVATRIX_ALLOW_TEST_RUNS", "description": "Set to 1 only to authorize requested verified_change package scripts", "format": "string", "isRequired": false}
+    ]
+  }]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "weavatrix-online",
+  "version": "0.1.0",
+  "description": "Online MCP connector for Weavatrix Cloud and licensed self-hosted deployments.",
+  "type": "module",
+  "private": false,
+  "license": "SEE LICENSE IN LICENSE.md",
+  "author": "Sergii Ziborov <sergii.ziborov@gmail.com>",
+  "homepage": "https://weavatrix.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sergii-ziborov/weavatrix-online.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sergii-ziborov/weavatrix-online/issues"
+  },
+  "mcpName": "io.github.sergii-ziborov/weavatrix-online",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "weavatrix-online": "bin/weavatrix-online.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "skill",
+    "docs/adr/0001-product-boundary.md",
+    "docs/releases/v0.1.0.md",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE.md",
+    "COMMERCIAL-LICENSE.md",
+    "server.json"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "verify:release": "node src/release-gate.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "weavatrix",
+    "code-graph",
+    "architecture",
+    "codex",
+    "openai-codex",
+    "coding-agents",
+    "claude",
+    "ai-agents"
+  ],
+  "dependencies": {
+    "weavatrix": "^0.3.0"
+  }
+}
