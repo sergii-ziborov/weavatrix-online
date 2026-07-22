@@ -1,6 +1,7 @@
 import {readFileSync, statSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 import {startMcpServer} from 'weavatrix/mcp-runtime'
+import {refactorExtension} from 'weavatrix-refactor/extension'
 import {createOnlineExtension} from './extension.mjs'
 
 const PACKAGE_URL = new URL('../package.json', import.meta.url)
@@ -23,7 +24,9 @@ export async function startOnlineMcp({argv = process.argv, isDirectory} = {}) {
   return startMcpServer({
     argv: runtimeArgv,
     defaultCapabilities: 'online',
-    loadExtensions: async () => [createOnlineExtension(PACKAGE.version)],
+    // online ⊃ refactor ⊃ core: load the refactor extension too so Online also exposes every
+    // refactoring tool, then Online's own network/planning tools on top.
+    loadExtensions: async () => [refactorExtension(), createOnlineExtension(PACKAGE.version)],
     packageJsonPath: fileURLToPath(PACKAGE_URL),
     packageVersion: PACKAGE.version,
     serverInfo: {name: 'weavatrix-online', version: PACKAGE.version},

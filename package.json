@@ -53,6 +53,7 @@
     "ai-agents"
   ],
   "dependencies": {
-    "weavatrix": "^0.3.0"
+    "weavatrix": "^0.3.0",
+    "weavatrix-refactor": "^0.0.1"
   }
 }

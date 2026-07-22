@@ -11,10 +11,12 @@ export function createOnlineExtension(version) {
   return defineWeavatrixExtension({
     name: 'weavatrix-online',
     version,
+    // 'edit' enables the refactor apply tools (gated by WEAVATRIX_ALLOW_SOURCE_EDITS at
+    // runtime); the read-only refactor plan producers ride on the core 'graph' cap.
     profiles: {
-      online: [...DEFAULT_CAPS, NETWORK_CAPABILITY],
-      cloud: [...DEFAULT_CAPS, NETWORK_CAPABILITY],
-      enterprise: [...DEFAULT_CAPS, NETWORK_CAPABILITY],
+      online: [...DEFAULT_CAPS, 'edit', NETWORK_CAPABILITY],
+      cloud: [...DEFAULT_CAPS, 'edit', NETWORK_CAPABILITY],
+      enterprise: [...DEFAULT_CAPS, 'edit', NETWORK_CAPABILITY],
     },
     tools: [
       {

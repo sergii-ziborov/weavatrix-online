@@ -53,15 +53,18 @@ test('Online composes the MIT core catalog in-process and adds its own tools and
   try {
     const initialized = await server.request('initialize', {protocolVersion: '2024-11-05', capabilities: {}, clientInfo: {name: 'test', version: '1'}})
     assert.deepEqual(initialized.serverInfo, {name: 'weavatrix-online', version: '0.1.0'})
-    assert.match(initialized.instructions, /profile=online; tools=39/)
+    // Online is the top of the stack: core (34) + refactor (11) + online (5) = 50.
+    assert.match(initialized.instructions, /profile=online; tools=50/)
     const listed = await server.request('tools/list')
-    assert.equal(listed.tools.length, 39)
-    for (const name of ['graph_stats', 'get_dependents', 'run_audit', 'online_status', 'refresh_advisories', 'preview_sync', 'sync_graph']) {
+    assert.equal(listed.tools.length, 50)
+    // one representative from each layer: core, refactor (read-only + apply), online
+    for (const name of ['graph_stats', 'run_audit', 'rename_symbol', 'move_symbol', 'apply_edit_plan', 'online_status', 'refresh_advisories', 'sync_graph']) {
       assert.ok(listed.tools.some((tool) => tool.name === name), name)
     }
-    assert.deepEqual(listed._meta['weavatrix/runtime'].extensions, [{
-      name: 'weavatrix-online', version: '0.1.0', tools: 5, auditProviders: 0, skills: ['weavatrix-online'],
-    }])
+    const extensions = listed._meta['weavatrix/runtime'].extensions
+    const byName = new Map(extensions.map((extension) => [extension.name, extension]))
+    assert.equal(byName.get('refactor').tools, 11, 'refactor layer exposes 11 tools')
+    assert.equal(byName.get('weavatrix-online').tools, 5, 'online layer exposes 5 tools')
     const stats = await server.request('tools/call', {name: 'graph_stats', arguments: {output_format: 'json'}})
     assert.equal(stats.isError, undefined, server.stderr())
     const preview = await server.request('tools/call', {name: 'preview_sync', arguments: {output_format: 'json'}}, 120000)
