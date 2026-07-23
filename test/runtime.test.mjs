@@ -52,7 +52,7 @@ test('Online composes the MIT core catalog in-process and adds its own tools and
   const server = start(repo, join(parent, 'graphs'))
   try {
     const initialized = await server.request('initialize', {protocolVersion: '2024-11-05', capabilities: {}, clientInfo: {name: 'test', version: '1'}})
-    assert.deepEqual(initialized.serverInfo, {name: 'weavatrix-online', version: '0.1.0'})
+    assert.deepEqual(initialized.serverInfo, {name: 'weavatrix-online', version: '0.2.0'})
     // Online is the top of the stack: core (34) + refactor (11) + online (5) = 50.
     assert.match(initialized.instructions, /profile=online; tools=50/)
     const listed = await server.request('tools/list')

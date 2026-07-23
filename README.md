@@ -1,20 +1,25 @@
 # Weavatrix Online
 
 Online MCP overlay for Weavatrix Cloud and licensed Weavatrix Enterprise
-deployments. It composes the separately versioned, MIT-licensed, offline-first
-[`weavatrix`](https://github.com/sergii-ziborov/weavatrix) engine in-process and
-owns every outbound capability. The offline package keeps its own version
-history and its MIT license unchanged.
+deployments. It sits at the top of the layered Weavatrix stack —
+`weavatrix-online ⊃ weavatrix-refactor ⊃ weavatrix` — composing both lower
+layers in-process and owning every outbound capability. A single install of
+Weavatrix Online therefore exposes the whole stack: the read-only MIT core, the
+Apache-2.0 refactor layer, and Online's own network tools. Each lower package
+keeps its own version history and license unchanged.
 
-`weavatrix-online` starts at version `0.1.0` and tracks Weavatrix Core `0.3.x`
+`weavatrix-online` tracks Weavatrix Core `0.3.x` and the refactor layer `0.1.x`
 through explicit, compatible dependency updates — it never forks or privately
-patches the Core graph, parser, LSP or Health implementations.
+patches the Core graph, parser, LSP, Health, or the refactor engines.
 
 ## What Online adds
 
-Online exposes five tools on top of every offline Core tool, all gated behind
-the explicit `online` capability profile. Nothing leaves the machine without a
-local preview and an explicit confirmation.
+Online composes the full lower stack — the 34 read-only core tools and the 11
+refactor tools (9 plan producers plus `apply_edit_plan` / `rollback_last_apply`)
+— and adds five network tools of its own on top, for a combined surface of 50
+tools. The five Online tools are all gated behind the explicit `online`
+capability profile. Nothing leaves the machine without a local preview and an
+explicit confirmation.
 
 | Tool | Network | Purpose |
 | --- | --- | --- |
@@ -52,12 +57,15 @@ tenant and deployment authorization is enforced by the selected endpoint.
 
 ## Status
 
-Version 0.1.0 is the first source-available Online overlay for Weavatrix 0.3. It
-owns advisory refresh, local sync preview + exact-payload confirmation, graph
-sync, target-architecture contract pull, and Cloud/Enterprise endpoint
-authentication + capability negotiation. It can register its own proprietary MCP
-tools, packaged skills and local analyzer providers through the Core extension
-API; those augment the baseline and never replace Core providers.
+Version 0.2.0 makes Online the top of the layered stack: it composes the
+Apache-2.0 refactor layer in-process (adding preview → confirm-token → apply →
+rollback refactoring) on top of the MIT read-only core, then adds its own
+outbound tools. Online owns advisory refresh, local sync preview + exact-payload
+confirmation, graph sync, target-architecture contract pull, and Cloud/Enterprise
+endpoint authentication + capability negotiation. It can register its own
+proprietary MCP tools, packaged skills and local analyzer providers through the
+Core extension API; those augment the baseline and never replace lower-layer
+providers.
 
 ## Development bootstrap
 

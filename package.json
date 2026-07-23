@@ -1,6 +1,6 @@
 {
   "name": "weavatrix-online",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Online MCP connector for Weavatrix Cloud and licensed self-hosted deployments.",
   "type": "module",
   "private": false,
@@ -26,7 +26,7 @@
     "src",
     "skill",
     "docs/adr/0001-product-boundary.md",
-    "docs/releases/v0.1.0.md",
+    "docs/releases/v0.2.0.md",
     "README.md",
     "SECURITY.md",
     "LICENSE.md",
@@ -53,7 +53,7 @@
     "ai-agents"
   ],
   "dependencies": {
-    "weavatrix": "^0.3.0",
-    "weavatrix-refactor": "^0.0.1"
+    "weavatrix": "^0.3.14",
+    "weavatrix-refactor": "^0.1.2"
   }
 }

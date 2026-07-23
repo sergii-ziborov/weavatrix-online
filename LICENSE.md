@@ -7,7 +7,7 @@ Copyright (c) 2026 Sergii Ziborov. All rights reserved.
 This license applies to the original source and documentation in the
 `weavatrix-online` repository (the **Online Materials**). It does not apply to
 third-party dependencies, including the separately distributed MIT-licensed
-`weavatrix` core package.
+`weavatrix` core package and Apache-2.0-licensed `weavatrix-refactor` package.
 
 ## 2. Permission to inspect
 

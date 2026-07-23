@@ -54,10 +54,12 @@ test('capability discovery reports Cloud/Enterprise payload compatibility withou
   }
 })
 
-test('license and package metadata keep MIT core separate from Online source terms', () => {
+test('license and package metadata keep both lower layers separate from Online source terms', () => {
   const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
   const license = readFileSync(new URL('../LICENSE.md', import.meta.url), 'utf8')
   assert.equal(pkg.license, 'SEE LICENSE IN LICENSE.md')
-  assert.equal(pkg.dependencies.weavatrix, '^0.3.0')
+  assert.equal(pkg.dependencies.weavatrix, '^0.3.14')
+  assert.equal(pkg.dependencies['weavatrix-refactor'], '^0.1.2')
   assert.match(license, /does not apply to[\s\S]*separately distributed MIT-licensed[\s\S]*`weavatrix` core package/i)
+  assert.match(license, /Apache-2\.0-licensed `weavatrix-refactor` package/i)
 })

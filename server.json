@@ -1,15 +1,15 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.sergii-ziborov/weavatrix-online",
-  "description": "Expanded Weavatrix MCP for Cloud and licensed Enterprise endpoints, built on the MIT offline core.",
+  "description": "Expanded Weavatrix MCP for Cloud and licensed Enterprise endpoints, composing the refactor layer over the MIT offline core.",
   "repository": {"url": "https://github.com/sergii-ziborov/weavatrix-online", "source": "github"},
-  "version": "0.1.0",
+  "version": "0.2.0",
   "websiteUrl": "https://weavatrix.com",
   "packages": [{
     "registryType": "npm",
     "registryBaseUrl": "https://registry.npmjs.org",
     "identifier": "weavatrix-online",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "runtimeHint": "npx",
     "transport": {"type": "stdio"},
     "packageArguments": [{
