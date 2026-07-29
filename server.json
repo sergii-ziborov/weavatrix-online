@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.sergii-ziborov/weavatrix-online",
-  "description": "MIT MCP connector for controlled, source-free repository intelligence sync with Weavatrix Cloud and self-hosted endpoints.",
+  "description": "MIT MCP connector for source-free Weavatrix Cloud and self-hosted repository intelligence sync.",
   "repository": {"url": "https://github.com/sergii-ziborov/weavatrix-online", "source": "github"},
   "version": "0.3.0",
   "websiteUrl": "https://weavatrix.com",
