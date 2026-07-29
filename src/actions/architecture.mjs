@@ -1,6 +1,6 @@
 import {
   activeRepositoryIdentity, cacheArchitectureContract, toolResult,
-} from 'weavatrix/extension/local-services'
+} from 'weavatrix-js/extension/local-services'
 import {syncDestination} from '../destination.mjs'
 
 export async function pullArchitectureContract(graph, args, ctx) {

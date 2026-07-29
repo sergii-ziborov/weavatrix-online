@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto'
-import {createSourceFreeSyncMaterial, toolResult} from 'weavatrix/extension/local-services'
+import {createSourceFreeSyncMaterial, toolResult} from 'weavatrix-js/extension/local-services'
 import {syncDestination} from '../destination.mjs'
 import {discoverEndpointCapabilities} from '../endpoint-capabilities.mjs'
 

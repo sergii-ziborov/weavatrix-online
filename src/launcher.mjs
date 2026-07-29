@@ -1,6 +1,6 @@
 import {readFileSync, statSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
-import {startMcpServer} from 'weavatrix/mcp-runtime'
+import {startMcpServer} from 'weavatrix-js/mcp-runtime'
 import {refactorExtension} from 'weavatrix-refactor/extension'
 import {createOnlineExtension} from './extension.mjs'
 

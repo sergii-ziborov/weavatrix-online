@@ -52,19 +52,19 @@ test('Online composes the MIT core catalog in-process and adds its own tools and
   const server = start(repo, join(parent, 'graphs'))
   try {
     const initialized = await server.request('initialize', {protocolVersion: '2024-11-05', capabilities: {}, clientInfo: {name: 'test', version: '1'}})
-    assert.deepEqual(initialized.serverInfo, {name: 'weavatrix-online', version: '0.2.0'})
-    // Online is the top of the stack: core (34) + refactor (11) + online (5) = 50.
-    assert.match(initialized.instructions, /profile=online; tools=50/)
+    assert.deepEqual(initialized.serverInfo, {name: 'weavatrix-online', version: '0.3.0'})
+    // Online is the top of the stack: core (34) + refactor (11) + online (7) = 52.
+    assert.match(initialized.instructions, /profile=online; tools=52/)
     const listed = await server.request('tools/list')
-    assert.equal(listed.tools.length, 50)
+    assert.equal(listed.tools.length, 52)
     // one representative from each layer: core, refactor (read-only + apply), online
-    for (const name of ['graph_stats', 'run_audit', 'rename_symbol', 'move_symbol', 'apply_edit_plan', 'online_status', 'refresh_advisories', 'sync_graph']) {
+    for (const name of ['graph_stats', 'run_audit', 'rename_symbol', 'move_symbol', 'apply_edit_plan', 'online_status', 'refresh_advisories', 'scan_dependency_vulnerabilities', 'scan_dependency_malware', 'sync_graph']) {
       assert.ok(listed.tools.some((tool) => tool.name === name), name)
     }
     const extensions = listed._meta['weavatrix/runtime'].extensions
     const byName = new Map(extensions.map((extension) => [extension.name, extension]))
     assert.equal(byName.get('refactor').tools, 11, 'refactor layer exposes 11 tools')
-    assert.equal(byName.get('weavatrix-online').tools, 5, 'online layer exposes 5 tools')
+    assert.equal(byName.get('weavatrix-online').tools, 7, 'online layer exposes 7 tools')
     const stats = await server.request('tools/call', {name: 'graph_stats', arguments: {output_format: 'json'}})
     assert.equal(stats.isError, undefined, server.stderr())
     const preview = await server.request('tools/call', {name: 'preview_sync', arguments: {output_format: 'json'}}, 120000)

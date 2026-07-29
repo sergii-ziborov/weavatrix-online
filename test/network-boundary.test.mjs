@@ -8,7 +8,8 @@ import {createOnlineExtension} from '../src/extension.mjs'
 test('Online owns the expanded network catalog while retaining core profiles underneath', () => {
   const extension = createOnlineExtension('0.1.0')
   assert.deepEqual(extension.tools.map((tool) => tool.name), [
-    'online_status', 'refresh_advisories', 'pull_architecture_contract', 'preview_sync', 'sync_graph',
+    'online_status', 'refresh_advisories', 'scan_dependency_vulnerabilities',
+    'scan_dependency_malware', 'pull_architecture_contract', 'preview_sync', 'sync_graph',
   ])
   assert.ok(extension.profiles.online.includes('graph'))
   assert.ok(extension.profiles.online.includes('health'))
@@ -54,12 +55,12 @@ test('capability discovery reports Cloud/Enterprise payload compatibility withou
   }
 })
 
-test('license and package metadata keep both lower layers separate from Online source terms', () => {
+test('Online and both composed layers publish under MIT package metadata', () => {
   const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
   const license = readFileSync(new URL('../LICENSE.md', import.meta.url), 'utf8')
-  assert.equal(pkg.license, 'SEE LICENSE IN LICENSE.md')
-  assert.equal(pkg.dependencies.weavatrix, '^0.3.14')
-  assert.equal(pkg.dependencies['weavatrix-refactor'], '^0.1.2')
-  assert.match(license, /does not apply to[\s\S]*separately distributed MIT-licensed[\s\S]*`weavatrix` core package/i)
-  assert.match(license, /Apache-2\.0-licensed `weavatrix-refactor` package/i)
+  assert.equal(pkg.license, 'MIT')
+  assert.equal(pkg.dependencies['weavatrix-js'], '^0.3.15')
+  assert.equal(pkg.dependencies['weavatrix-refactor'], '^0.1.3')
+  assert.match(license, /^MIT License/)
+  assert.match(license, /Permission is hereby granted, free of charge/)
 })

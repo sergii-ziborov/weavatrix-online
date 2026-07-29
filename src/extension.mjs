@@ -1,7 +1,8 @@
-import {DEFAULT_CAPS} from 'weavatrix/mcp-runtime'
-import {defineWeavatrixExtension} from 'weavatrix/extension-api'
-import {refreshAdvisories} from './actions/advisories.mjs'
+import {DEFAULT_CAPS} from 'weavatrix-js/mcp-runtime'
+import {defineWeavatrixExtension} from 'weavatrix-js/extension-api'
+import {refreshAdvisories, scanDependencyVulnerabilities} from './actions/advisories.mjs'
 import {pullArchitectureContract} from './actions/architecture.mjs'
+import {scanDependencyMalwareTool} from './actions/malware.mjs'
 import {previewSync, syncGraph} from './actions/sync.mjs'
 import {onlineStatus} from './endpoint-capabilities.mjs'
 
@@ -29,9 +30,31 @@ export function createOnlineExtension(version) {
       {
         cap: NETWORK_CAPABILITY,
         name: 'refresh_advisories',
-        description: "NETWORK / explicit Online profile: query OSV for the active repo's concrete npm/PyPI/Go/Maven/Gradle/Cargo versions, validate results through the MIT core, and refresh its offline advisory cache.",
+        description: "NETWORK / explicit Online profile: inventory exact npm/PyPI/Go/Maven/Gradle/Cargo versions, query OSV, validate returned records in Online-owned code, and refresh Online's local advisory cache.",
         inputSchema: {type: 'object', properties: {timeout_ms: {type: 'integer', minimum: 1000, maximum: 120000, default: 20000}}},
         run: refreshAdvisories,
+      },
+      {
+        cap: NETWORK_CAPABILITY,
+        name: 'scan_dependency_vulnerabilities',
+        description: 'LOCAL / explicit Online profile: match the current exact dependency inventory against the validated Online advisory cache. Missing, stale, partial, or inventory-mismatched cache state never produces a clean zero.',
+        inputSchema: {type: 'object', properties: {
+          max_age_days: {type: 'integer', minimum: 1, maximum: 365, default: 30},
+        }},
+        run: scanDependencyVulnerabilities,
+      },
+      {
+        cap: NETWORK_CAPABILITY,
+        name: 'scan_dependency_malware',
+        description: 'LOCAL / explicit Online profile: bounded static heuristic review of installed dependency code. Returns review evidence and completeness only; never claims execution, credential exposure, or package compromise.',
+        inputSchema: {type: 'object', properties: {
+          max_packages: {type: 'integer', minimum: 1, maximum: 5000, default: 2000},
+          max_files: {type: 'integer', minimum: 1, maximum: 100000, default: 50000},
+          max_bytes: {type: 'integer', minimum: 1024, maximum: 268435456, default: 67108864},
+          max_file_bytes: {type: 'integer', minimum: 1024, maximum: 4194304, default: 1048576},
+          max_findings: {type: 'integer', minimum: 1, maximum: 1000, default: 500},
+        }},
+        run: scanDependencyMalwareTool,
       },
       {
         cap: NETWORK_CAPABILITY,
@@ -60,7 +83,7 @@ export function createOnlineExtension(version) {
         run: syncGraph,
       },
     ],
-    // Proprietary local analyzers can be registered here later. They augment run_audit and cannot
+    // Additional local analyzers can be registered here later. They augment run_audit and cannot
     // replace core providers; the extension API requires network:"none" for analyzer hooks.
     auditProviders: [],
     skills: [{name: 'weavatrix-online', path: 'skill/SKILL.md'}],
