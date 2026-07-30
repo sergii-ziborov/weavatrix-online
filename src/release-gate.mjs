@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url)
 const own = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 const lock = JSON.parse(readFileSync(new URL('../package-lock.json', import.meta.url), 'utf8'))
 const server = JSON.parse(readFileSync(new URL('../server.json', import.meta.url), 'utf8'))
+const architecture = JSON.parse(readFileSync(new URL('../.weavatrix/architecture.json', import.meta.url), 'utf8'))
 const core = require('weavatrix-js/package.json')
 const refactor = require('weavatrix-refactor/package.json')
 const failures = []
@@ -22,8 +23,15 @@ if (lock.packages?.['']?.license !== own.license) failures.push('package-lock ro
 if (lock.packages?.['node_modules/weavatrix-js']?.version !== core.version) failures.push('package-lock weavatrix-js version does not match the installed package')
 if (server.version !== own.version || server.packages?.[0]?.version !== own.version) failures.push('MCP Registry metadata version does not match package.json')
 if (server.name !== own.mcpName) failures.push('MCP Registry name does not match package mcpName')
+if (server.description.length > 100) failures.push('MCP Registry description must be at most 100 characters')
+if (architecture.enforcement !== 'strict') failures.push('architecture enforcement must be strict')
+if (architecture.budgets?.runtimeCycles !== 0) failures.push('architecture runtime cycle budget must be zero')
+if (architecture.budgets?.maxFileLoc !== 300) failures.push('architecture file budget must be 300')
+if (architecture.budgets?.maxFunctionLoc !== 100) failures.push('architecture function budget must be 100')
+if (architecture.exceptions?.length) failures.push('architecture exceptions must be empty')
+if (architecture.ratchet?.baseline?.fingerprints?.length) failures.push('architecture violation baseline must be empty')
 if (!existsSync(releaseNotes) || !readFileSync(releaseNotes, 'utf8').trim()) failures.push('checked-in release notes are missing or empty')
-for (const required of ['LICENSE.md', 'README.md', 'server.json']) {
+for (const required of ['LICENSE.md', 'README.md', 'server.json', '.weavatrix/architecture.json']) {
   if (!own.files?.includes(required)) failures.push(`published package files must include ${required}`)
 }
 if (!/^MIT License\r?\n/.test(readFileSync(new URL('../LICENSE.md', import.meta.url), 'utf8'))) {

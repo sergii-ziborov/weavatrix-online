@@ -1,0 +1,120 @@
+{
+  "architectureContractV": 1,
+  "name": "Weavatrix Online source-free connector",
+  "style": "modular-ports-and-adapters",
+  "enforcement": "strict",
+  "components": [
+    {
+      "id": "policy",
+      "name": "Pure destination, version, inventory, and evidence policy",
+      "paths": [
+        "src/destination.mjs",
+        "src/security/inventory-model.mjs",
+        "src/security/malware-rules.mjs",
+        "src/security/version-match.mjs"
+      ]
+    },
+    {
+      "id": "discovery",
+      "name": "Bounded repository and installed-package discovery adapters",
+      "paths": [
+        "src/security/dependency-discovery.mjs",
+        "src/security/inventory-parsers-native.mjs",
+        "src/security/inventory-parsers-node-python.mjs",
+        "src/security/inventory.mjs",
+        "src/security/malware-file-scan.mjs",
+        "src/security/manifest-discovery.mjs"
+      ]
+    },
+    {
+      "id": "security",
+      "name": "Advisory cache and security evidence application services",
+      "paths": [
+        "src/security/advisory-cache.mjs",
+        "src/security/advisory-store.mjs",
+        "src/security/malware-report.mjs",
+        "src/security/malware-scan.mjs"
+      ]
+    },
+    {
+      "id": "online-actions",
+      "name": "Consent-gated network and Online MCP use cases",
+      "paths": [
+        "src/actions",
+        "src/endpoint-capabilities.mjs"
+      ]
+    },
+    {
+      "id": "composition",
+      "name": "MCP extension, launcher, and executable adapters",
+      "paths": [
+        "src/extension.mjs",
+        "src/launcher.mjs",
+        "bin"
+      ]
+    },
+    {
+      "id": "verification",
+      "name": "Release gates, tests, and CI automation",
+      "paths": [
+        "src/release-gate.mjs",
+        "scripts",
+        "test",
+        ".github"
+      ]
+    }
+  ],
+  "dependencyRules": [
+    {
+      "id": "policy-stays-inward",
+      "action": "forbid",
+      "from": ["policy"],
+      "to": ["discovery", "security", "online-actions", "composition"],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
+      "id": "discovery-does-not-own-use-cases",
+      "action": "forbid",
+      "from": ["discovery"],
+      "to": ["security", "online-actions", "composition"],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
+      "id": "security-does-not-own-network-or-composition",
+      "action": "forbid",
+      "from": ["security"],
+      "to": ["online-actions", "composition"],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
+      "id": "online-actions-do-not-own-composition",
+      "action": "forbid",
+      "from": ["online-actions"],
+      "to": ["composition"],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
+      "id": "runtime-does-not-depend-on-verification",
+      "action": "forbid",
+      "from": ["policy", "discovery", "security", "online-actions", "composition"],
+      "to": ["verification"],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    }
+  ],
+  "budgets": {
+    "runtimeCycles": 0,
+    "maxFileLoc": 300,
+    "maxFunctionLoc": 100
+  },
+  "technologies": {
+    "required": ["node"],
+    "forbidden": []
+  },
+  "exceptions": [],
+  "ratchet": {
+    "baseline": {
+      "fingerprints": [],
+      "metrics": {}
+    }
+  }
+}

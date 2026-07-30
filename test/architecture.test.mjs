@@ -74,3 +74,18 @@ test('pull_architecture_contract fetches, validates, caches, and reports ACTIVE'
     rmSync(root, {recursive: true, force: true})
   }
 })
+
+test('the shipped connector contract is strict and has no hidden debt baseline', () => {
+  const contract = JSON.parse(readFileSync(
+    new URL('../.weavatrix/architecture.json', import.meta.url),
+    'utf8',
+  ))
+  assert.equal(contract.enforcement, 'strict')
+  assert.deepEqual(contract.budgets, {
+    runtimeCycles: 0,
+    maxFileLoc: 300,
+    maxFunctionLoc: 100,
+  })
+  assert.deepEqual(contract.exceptions, [])
+  assert.deepEqual(contract.ratchet.baseline, {fingerprints: [], metrics: {}})
+})

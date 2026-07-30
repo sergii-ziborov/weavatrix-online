@@ -1,56 +1,104 @@
-# ADR 0001: Online overlay product boundary
+# ADR 0001: Online connector product boundary
 
-Status: accepted for 0.1.0; supersedes any fork interpretation
+Status: accepted; revised for 0.3.1
 
 ## Decision
 
-`weavatrix-js` is the MIT-licensed engine used by the current Online
-composition. It owns the graph,
-parsers, bundled LSP, Health, dependency, duplicate, impact and local
-architecture engine. The 0.3 offline artifact contains no outbound HTTP tool or
-Hosted credential surface.
+`weavatrix-online` is the independently versioned MIT MCP product that owns
+Weavatrix network behavior. It composes the public `weavatrix-js` repository
+engine and `weavatrix-refactor` extension in-process, then adds a small explicit
+Online surface.
 
-`weavatrix-online` is a separately versioned expanded overlay that depends on a
-compatible `weavatrix-js` package through `weavatrix-refactor`. It owns network transport, authentication,
-endpoint capability negotiation, consent and online workflow composition, and
-may add Online-specific tools, skills and local analyzer providers. It never copies
-or forks core implementation code and never replaces a core tool/provider.
+The complete profile has 52 tools:
 
-One overlay build targets:
+1. 34 local repository-intelligence tools from `weavatrix-js`;
+2. 11 refactor planning, apply, and rollback tools from
+   `weavatrix-refactor`;
+3. 7 Online tools implemented here.
 
-1. Weavatrix Cloud, the operator-managed multi-tenant service.
-2. Compatible customer-controlled deployments.
+Online owns destination validation, endpoint capability negotiation,
+authentication headers, architecture-contract retrieval, OSV advisory refresh,
+installed-package malware review, consent previews, and synchronization.
+Neither dependency may silently perform those network workflows on Online's
+behalf.
 
-Both use the same versioned source-free wire contract.
+## Distribution boundary
 
-The canonical native `weavatrix` package is an independent offline product in
-this release line. Online and Refactor will move to Rust in a later, separately
-verified migration; the current JS composition does not import the canonical
-package by name.
+The native `weavatrix` MCP product is distributed through both npm and Cargo.
+Those are two installation paths for the same local-first native product.
+`weavatrix-rust` is its protocol-independent engine and does not own MCP
+transport.
+
+`weavatrix-online` is a separate npm package. It does not proxy the native
+binary and does not import the canonical package by name. Its current,
+verified composition is:
+
+```text
+weavatrix-online
+  ├─ weavatrix-refactor
+  └─ weavatrix-js
+```
+
+No migration promise is part of this boundary. A future implementation change
+must preserve the public tool, consent, security, and wire contracts and pass a
+separate release review.
+
+## Endpoint boundary
+
+One connector build targets:
+
+1. Weavatrix Cloud, the operator-managed service;
+2. compatible customer-controlled deployments.
+
+Both use the same versioned capability and source-free sync contracts. HTTP is
+allowed only for explicit loopback development; every non-loopback destination
+must use HTTPS.
+
+`preview_sync` performs no network request. `sync_graph` can send only the exact
+allowlisted body approved for the same repository, graph, destination, payload
+version, and five-minute confirmation window.
+
+## Security ownership
+
+Online owns exact package inventory across the supported lock/manifests,
+validated advisory-cache state, current-inventory matching, and bounded static
+malware evidence. Missing, stale, partial, or mismatched evidence cannot produce
+a clean zero.
+
+Static malware findings are review signals. They never assert package origin,
+execution, credential exposure, safety, or compromise.
+
+Source writes remain a separate Refactor capability and require both a
+plan-bound confirmation and `WEAVATRIX_ALLOW_SOURCE_EDITS=1`. Allowlisted
+package scripts require an explicit tool argument and
+`WEAVATRIX_ALLOW_TEST_RUNS=1`.
 
 ## Core update model
 
-All graph/LSP/Health/analyzer improvements are implemented and released in the
-MIT core first. Online consumes them through a reviewed dependency update and
-compatibility tests. Online must not carry patched private copies of core files.
+Graph, parser, LSP, Health, impact, duplicate, search, and local architecture
+improvements are released in the appropriate MIT core package first. Online
+consumes reviewed dependency releases and must not carry patched private copies
+of core implementation files.
 
-The core exposes a local extension API for MCP tools, packaged skill metadata,
-local audit providers, source-free payload creation, package-coordinate
-inventory and validated architecture/advisory cache writes. Those services
-perform no network I/O. Online calls them and owns every HTTP request.
+The core extension API supplies local graph services, source-free payload
+creation, architecture-contract normalization, and MCP composition hooks.
+Online supplies all HTTP requests and Online-specific security storage.
 
-## Licensing
+## Architecture and release gates
 
-The Online overlay is MIT-licensed. Its independently distributed
-`weavatrix-js` and `weavatrix-refactor` dependencies are also MIT-licensed
-packages with their own version histories.
+Online follows the checked-in strict modular ports-and-adapters contract:
 
-## Release gates
+```text
+policy -> discovery -> security services -> Online actions -> MCP composition
+```
 
-Online releases are publishable only when:
+Releases require:
 
-- offline `weavatrix-js` 0.3 contains no network or dependency-security scanner surface;
-- Online owns all network implementations;
-- Cloud and Enterprise pass the same wire-contract suite;
-- dependency compatibility and MIT license checks pass;
-- release notes, registry metadata, tests, and the packed file list agree.
+- zero runtime architecture cycles;
+- production files at or below 300 physical lines;
+- production functions at or below 100 physical lines;
+- no architecture exceptions or violation baseline;
+- exact dependency, package-lock, MCP metadata, and release-note versions;
+- MIT metadata and license text;
+- passing runtime, consent-boundary, architecture, and security tests;
+- a clean npm audit and reviewed packed-file list.

